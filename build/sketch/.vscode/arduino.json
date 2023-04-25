@@ -1,0 +1,7 @@
+#line 1 "C:\\Users\\brody\\Documents\\Arduino\\LEDConstPower\\.vscode\\arduino.json"
+{
+    "board": "arduino:avr:uno",
+    "programmer": "avrispmkii",
+    "sketch": "LEDConstPower.ino",
+    "output": "build/"
+}
