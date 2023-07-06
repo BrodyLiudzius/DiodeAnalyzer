@@ -2,5 +2,6 @@
     "board": "arduino:avr:uno",
     "programmer": "avrispmkii",
     "sketch": "LEDConstPower.ino",
-    "output": "build/"
+    "output": "build/",
+    "port": "COM5"
 }

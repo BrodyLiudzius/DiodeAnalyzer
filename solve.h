@@ -3,9 +3,9 @@
 
 #include "diode.h"
 
-// All variables are in base units; amps, volts, kelvin, etc.
+#include <Arduino.h>
 
-const double roomTemperature = 293.0; // 20 centigrade
+// All variables are in base units; amps, volts, kelvin, etc.
 
 double CalculateRCSettleTime(double _resistance, double _capacitance, int _numStages) {
     // Ripple is lower for more stages and higher PWM frequency, so use whatever PWM
@@ -16,7 +16,7 @@ double CalculateRCSettleTime(double _resistance, double _capacitance, int _numSt
     // their time constants
 }
 
-Diode CalculateDiodeParameters(DiodeTestData _testData) {
+Diode CharacterizeDiode(DiodeTestData _testData) {
     const double elementaryCharge = 1.602176634E-19;
     const double boltzmannConstant = 1.380649E-23; // Is a more precise value known for boltmann's constant?
 
@@ -40,6 +40,10 @@ Diode CalculateDiodeParameters(DiodeTestData _testData) {
     return diode;
 }
 
+double CalculateCurrentRequiredForForwardVoltage(double _forwardVoltage, double _ballast, Diode _diode, double _temperature = roomTemperature) {
+    return _diode.saturationCurrent * (exp(_forwardVoltage / _diode.__A / _temperature) - 1);
+}
+
 double CalculateCurrentRequiredForPower(double _powerDissipation, Diode _diode, double _temperature = roomTemperature, StopCriteria _stopCriteria = {1000, 1E-6}) {
     // A variation of secant method is used to numerically solve for the current
     
@@ -53,7 +57,7 @@ double CalculateCurrentRequiredForPower(double _powerDissipation, Diode _diode, 
     double lowestRelTrueErr = INFINITY;
     double mostAccurateI;
 
-    while (iterations < _stopCriteria.maxIterations && relativeTrueError > _stopCriteria.maxRelativeError) {
+    while (iterations < _stopCriteria.maxIterations && abs(relativeTrueError) > _stopCriteria.maxRelativeError) {
         iterations++;
 
         double P0 = I0 * _diode.__A * _temperature * log(I0 / _diode.saturationCurrent);
@@ -62,7 +66,7 @@ double CalculateCurrentRequiredForPower(double _powerDissipation, Diode _diode, 
         double absoluteTrueError = P1 - _powerDissipation;
         relativeTrueError = absoluteTrueError / _powerDissipation;
 
-        if (relativeTrueError < lowestRelTrueErr)
+        if (abs(relativeTrueError) < lowestRelTrueErr)
             mostAccurateI = I1;
         
         double slope = (P0 - P1) / (I0 - I1);

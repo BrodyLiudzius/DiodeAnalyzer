@@ -1,6 +1,9 @@
 #ifndef DIODE_H_INCLUDED
 #define DIODE_H_INCLUDED
 
+// #edit: Consider changing these constants for your particular board
+const double roomTemperature = 293.0; // 20 centigrade
+
 struct Diode {
     // A & lnB are redundant info, but are kept becuase they are convenient for calculations
     double __A; // Can be found by emission coefficient times boltzmann's constant divided by elementary charge
@@ -39,7 +42,7 @@ struct DiodeTestData {
     double totalVoltage[2];
     double temperature[2]; // should be in Kelvin
 
-    double standardDeviation;
+    // #toDo: add some kind of measure of statistical uncertainty?
 };
 
 #endif
